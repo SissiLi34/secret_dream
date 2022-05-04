@@ -1,0 +1,95 @@
+{% extends "base.html.twig" %}
+
+{% block title %}
+	Accueil
+{% endblock %}
+
+{% block body %}
+
+	<h1>La boutique</h1>
+	<div
+		class="row">
+		{# Ma boucle for va générer 3 produits p qui sont dans mon tableau products de homeController #}
+		{% for p in products %}
+			<div class="col">
+				<div
+					class="card">
+					{# Je passe mon image faker #}
+					<img src="{{ p.mainPicture }}" class="img-fluid" alt="Photo d'un produit">
+					<div
+						class="card-body">
+						{# Je passe mon titre et le prix faker #}
+						<h4 class="card-title">{{ p.name }}
+							{{ p.price /100  }}
+							&euro;</h4>
+
+						<span class="badge bg-info badge-info">
+							{{ p.category.name }}
+						</span>
+
+
+						{# Je passe ma description faker #}
+						<p class="card-taxt">{{ p.shortDescription }}</p>
+						<a href="#" class="btn btn-primary btn-sm">Détails</a>
+						<a href="#" class="btn btn-success btn-sm">Ajouter</a>
+					</div>
+				</div>
+			</div>
+		{% endfor %}
+	</div>
+	<hr>
+	<h2>Comment procéder</h2>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Commodi, odit perspiciatis. Ut at quis veniam.</p>
+	<br>
+
+
+	<br>
+	<h1>Les services</h1>
+	<div class="row">
+		{% include "shared/_assurance.html.twig" with {
+            'color': 'primary',
+            'icone': 'fas fa-truck',
+            'text': "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quam et, sequi ipsum dolor vitae unde!"
+        } %}
+		{% include "shared/_assurance.html.twig" with {
+            'color': 'success',
+            'icone': 'fas fa-check',
+            'text': "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quam et, sequi ipsum dolor vitae unde!"
+        } %}
+		{% include "shared/_assurance.html.twig" with {
+            'color': 'warning',
+            'icone': 'fas fa-lock',
+            'text': "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quam et, sequi ipsum dolor vitae unde!"
+        } %}
+		{% include "shared/_assurance.html.twig" with {
+            'color': 'primary',
+            'icone': 'fas fa-truck',
+            'text': "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quam et, sequi ipsum dolor vitae unde!"
+        } %}
+		{% include "shared/_assurance.html.twig" with {
+            'color': 'primary',
+            'icone': 'fas fa-truck',
+            'text': "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quam et, sequi ipsum dolor vitae unde!"
+        } %}
+		{% include "shared/_assurance.html.twig" with {
+            'color': 'primary',
+            'icone': 'fas fa-truck',
+            'text': "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quam et, sequi ipsum dolor vitae unde!"
+        } %}
+		{% include "shared/_assurance.html.twig" with {
+            'color': 'primary',
+            'icone': 'fas fa-truck',
+            'text': "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quam et, sequi ipsum dolor vitae unde!"
+        } %}
+		{% include "shared/_assurance.html.twig" with {
+            'color': 'primary',
+            'icone': 'fas fa-truck',
+            'text': "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quam et, sequi ipsum dolor vitae unde!"
+        } %}
+		{% include "shared/_assurance.html.twig" with {
+            'color': 'primary',
+            'icone': 'fas fa-truck',
+            'text': "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quam et, sequi ipsum dolor vitae unde!"
+        } %}
+	</div>
+</div>{% endblock %}

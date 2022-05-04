@@ -4,11 +4,12 @@ namespace App\DataFixtures;
 
 use Faker;
 use App\Entity\Product;
+use App\Entity\Category;
+use Bluemmb\Faker\PicsumPhotosProvider;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\DBAL\Driver\IBMDB2\Exception\Factory;
 use Symfony\Component\String\Slugger\SluggerInterface;
-use App\Entity\Category;
 
 class AppFixtures extends Fixture
 {
@@ -29,7 +30,7 @@ class AppFixtures extends Fixture
         $faker->addProvider(new \Liior\Faker\Prices($faker));
         //J'ajoute le provider commerce qui va ajouter des nom de produits cohérents
         $faker->addProvider(new \Bezhanov\Faker\Provider\Commerce($faker));
-
+        $faker->addProvider(new \Bluemmb\Faker\PicsumPhotosProvider($faker));
 
         // Création de 3 catégories
         for ($c = 0; $c < 3; $c++) {
@@ -45,7 +46,14 @@ class AppFixtures extends Fixture
                     //J'applique ma nouvelle méthode Faker pur avoir un prix cohérent dans les conditions()
                     ->setPrice($faker->price(4000, 20000))
                     //Je prends le nom du produit et je le transforme en slug dans majuscule
-                    ->setSlug(strtolower($this->slugger->slug($product->getName())))->setCategory($category);
+                    ->setSlug(strtolower($this->slugger->slug($product->getName())))
+                    //Je rajoute une catégorie
+                    ->setCategory($category)
+                    //je rajoute un paragraphe
+                    ->setShortDescription($faker->paragraph())
+                    //Je rajote une image
+                    ->setMainPicture($faker->imageUrl(200, 200, true));
+                    
 
                 $manager->persist($product);
             }
