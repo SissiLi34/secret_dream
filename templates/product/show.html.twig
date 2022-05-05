@@ -5,6 +5,15 @@
 {% endblock %}
 
 {% block body %}
+
+<ol class="breadcrumb">
+  <li class="breadcrumb-item"><a href="#">Boutique</a></li>
+  <li class="breadcrumb-item"><a href="#">{{ product.category.name }}</a></li>
+  <li class="breadcrumb-item active">{{ product.name }}</li>
+</ol>
+
+
+
 	<h1>{{ product.name}}
 		({{ product.price / 100}}€)		
 		</h1>
