@@ -23,6 +23,7 @@ class Category
     private $slug;
 
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: product::class)]
+    // Tableau de produits
     private $produts;
 
     public function __construct()

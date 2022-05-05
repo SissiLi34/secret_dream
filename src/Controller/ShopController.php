@@ -9,21 +9,15 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ShopController extends AbstractController
 {
-    #[Route('/shop', name: 'app_shop')]
+    #[Route('/boutique', name: 'app_shop_shop')]
     public function shop(ProductRepository $productRepository): Response
     {
 
-
-
-//Je créé une variable qui demandea productRepository d'aller mes chercher des produits avec des critères (3 produits) 
-$products = $productRepository->findBy([], [], 3);
-//dd($products);
-//Je passe ma variable product à mon template
-
-
-
-
+        //Je créé une variable qui demandea productRepository d'aller mes chercher des produits avec des critères (3 produits) 
+        $products = $productRepository->findBy([], [], 3);
+        //dd($products);
         
+        //Je passe ma variable product à mon templat
         return $this->render('shop/shop.html.twig', [
             'products' => $products
         ]);

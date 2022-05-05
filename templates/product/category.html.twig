@@ -1,20 +1,26 @@
-{% extends 'base.html.twig' %}
+{% extends "base.html.twig" %}
 
-{% block title %}Hello ShopController!{% endblock %}
+{% block title %}
+	Categorie:
+	{{ slug }}
+{% endblock %}
 
 {% block body %}
-<div class="container">
-	<h1>La boutique</h1>
+	<h1>Catégorie :
+		{{ category.name }}</h1>
+
+
+	
 	<div class="row">
-		{# Ma boucle for va générer 3 produits p qui sont dans mon tableau products de homeController #}
-		{% for p in products %}
-			<div class="col">
-				<div
-					class="card">
+		{# Pour chaque produit à l'interrieur de la catégorie du tableau produts #}
+		{% for p in category.produts %}
+        {# Je remets mes cards produits #}
+			<div class="col-4">				
+				<div class="card">
 					{# Je passe mon image faker #}
 					<img src="{{ p.mainPicture }}" class="img-fluid" alt="Photo d'un produit">
-					<div
-						class="card-body">
+					
+					<div class="card-body">
 						{# Je passe mon titre et le prix faker #}
 						<h4 class="card-title">{{ p.name }}
 							{{ p.price /100  }}
@@ -34,9 +40,4 @@
 			</div>
 		{% endfor %}
 	</div>
-	<hr>
-	<h2>Comment procéder</h2>
-	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Commodi, odit perspiciatis. Ut at quis veniam.</p>
-	</div>
-	<br>
 {% endblock %}
