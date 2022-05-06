@@ -8,9 +8,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+
 class ProductController extends AbstractController
 {
-    #[Route('/{slug}', name: 'app_product_category')]
+    #[Route('/category/{slug}', name: 'app_product_category')]
     //Je me fais livrer avec le repository ma table catégorie de ma bdd
     public function category($slug, CategoryRepository $categoryRepository): Response
     {
@@ -39,6 +40,7 @@ class ProductController extends AbstractController
     #[Route('/{category_slug}/{slug}', name:'product_show')]
     //Je créée la function qui permettra d'afficher un seul produit en recevant mon slug et en permettant aux données de ma bdd d'etre remonté de la table des produits grace à productRepository
     public function show($slug, ProductRepository $productRepository) {
+        
         $product = $productRepository->findOneBy([
             'slug' => $slug
         ]);
