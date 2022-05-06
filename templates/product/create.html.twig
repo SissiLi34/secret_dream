@@ -1,10 +1,53 @@
 {% extends "base.html.twig" %}
 
+{# _self signifie à twig que je veux utiliser le fichier que j'ai créé ici en bas plutot que dans un fichier extérieur #}
+{% form_theme formView _self %}
+
 {% block title %}
-Création produit
+	Création d'un produit
 {% endblock %}
 
 {% block body %}
-<h1>Nouveau produit</h1>
-{{ form(formView) }}
+	<h1>Nouveau produit</h1>
+
+	{{ form_start(formView) }}
+
+	{{ form_errors(formView)}}
+
+	<div class="row">
+		<div class="col">
+			{{ form_row(formView.name) }}
+			{{ form_row(formView.price) }}
+		</div>
+
+		<div class="col">
+			{{ form_row(formView.category) }}
+			{{ form_row(formView.shortDescription) }}
+		</div>
+	</div>
+
+	<button
+		type="submit" class="btn btn-primary">
+		{# Icone enregistrement #}
+		<i class="fas fa-save"></i>
+		Créer le produit
+	</button>
+
+	{{ form_end(formView) }}
+
+{% endblock %}
+
+{# Je crée mon block form_row qui est appelé lorsque je souhaite l'utiliser #}
+{% block form_row %}
+	<div
+		class="form_group">
+		{# La variable form représente le formView appelé  #}
+		{{ form_label(form) }}
+		{# Je veux le widget de form en lui passant l'attribut du form-control #}
+		{{ form_widget(form, {'attr': { 'class': 'form-control'} }) }}
+		{{ form_help(form) }}
+		{{ form_errors(form) }}
+	</div>
+
+
 {% endblock %}

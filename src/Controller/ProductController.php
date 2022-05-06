@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Category;
 use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
@@ -62,25 +64,23 @@ class ProductController extends AbstractController
     }
 
     #[Route('/admin/product/create', name:'product_create')]
-    //création du formulaire création de produit dans laquelle je me fais livrer le CategoryRepository pour avoir accès a la bdd
-    public function create(FormFactoryInterface $factory, CategoryRepository $categoryRepository) 
+    //création du formulaire création de produit 
+    public function create(FormFactoryInterface $factory) 
     {
         $builder = $factory->createBuilder();
-        //Je construis mo formulaire
+        //Je construis mon formulaire
         //J'importe la class que je souhaite
         $builder->add('name', TextType::class, [
             //je passe tous mes paramètre dans le tableau
             'label' => 'Nom du produit',
             'attr' => [
-                //Form bootstrap
-                'class' => 'form-control', 
+                //Form bootstrap 
                 'placeholder' => 'Tapez le nom du produit']
         ])
             //Descrition avec textarea
             ->add('shortDescription', TextareaType::class, [
                 'label' => 'Description courte',
                 'attr' => [
-                'class' => 'form-control',
                 'placeholder' => 'Tapez une description assez courte mais parlante pour le visiteur'
                 ]
             ])
@@ -88,34 +88,21 @@ class ProductController extends AbstractController
             ->add('price', MoneyType::class, [
                 'label' => 'Prix du produit',
                 'attr' => [
-                'class' => 'form-control',
                 'placeholder' => 'Tapez le prix du produit en €'
                 ]
-                ]);
-
-//Je stoppe mes add pour rajouter un tableau option pour le menu déroulant
-
-//Les optins sont égale à un tableau
-$options = [];
-//Pour chaque catégorie que je trouve dans la bdd et que je nome $category
-foreach($categoryRepository->findAll() as $category) {
-    //Je créé dans mes options une clés qui soit le nom de la catégorie et la valeur qui sera l'identifiant de la catégorie
-    $options[$category->getName()] = $category->getId();
-    
-}
-
-//dd($options);
+                ])
 
 
-                
             //Menu déroulant
-            $builder->add('category', ChoiceType::class, [
+                ->add('category', EntityType::class, [
                 'label' => 'Catégorie',
-                'attr' => [
-                'class' => 'form-control'],
                 'placeholder' => '--Choisir une catégorie--',
-                //Je passe dans mes choix le tableau option construit au dessus
-                'choices' => $options
+                //L'entité que je veux c'est l'entité catégorie
+                'class' => Category::class,
+                //Et je veux afficher le name des catégories dans la fonction et ce qui va s'afficher sera en majuscule
+                'choice_label' => function (Category $category) {
+                    return strtoupper($category->getName());
+                }
             ]);
 
             $form = $builder->getForm();
