@@ -1,14 +1,13 @@
 {% extends "base.html.twig" %}
 
-{# _self signifie à twig que je veux utiliser le fichier que j'ai créé ici en bas plutot que dans un fichier extérieur #}
 {# {% form_theme formView 'bootstrap_4_layout.html.twig' %} #}
 
 {% block title %}
-	Création d'un produit
+Edition de {{ product.name }}
 {% endblock %}
 
 {% block body %}
-	<h1>Nouveau produit</h1>
+<h1>Editer le produit {{ product.name }}</h1>
 
 	{{ form_start(formView) }}
 

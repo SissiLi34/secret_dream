@@ -69,15 +69,50 @@ class ProductController extends AbstractController
         ]);
     }
 
+
+    #[Route('/admin/product/{id}/edit', name: 'product_edit')]
+    //dans ma fonction je reçois l'identifiant qu'il y a dans ma route, j'ai besoin d'aller cherher mon id a éditer donc je fais appel au repository
+    public function edit($id, ProductRepository $productRepository, Request $request, EntityManagerInterface $em)
+    {
+
+        //J'utilise la fonction find
+        $product = $productRepository->find($id);
+
+        //Création du formulaire d'édition et du forulaire que j'ai créé
+        //CréateForm permet de passer un produit et le formulaire travaillera sur celi-ciu
+        $form = $this->createForm(ProductType::class, $product);
+
+
+        //$form->setData($product);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            // $product = $form->getData();
+            $em->flush();
+            dd($product);
+        }
+
+        //J'affiche la vue de mon formulaire
+        $formView = $form->createView();
+
+        //et je return l'affichage et le formView
+        return $this->render('product/edit.html.twig', [
+            'product' => $product,
+            'formView' => $formView
+        ]);
+    }
+
+
     #[Route('/admin/product/create', name: 'product_create')]
     //création du formulaire création de produit 
-    public function create(FormFactoryInterface $factory, Request $request, SluggerInterface $slugger, EntityManagerInterface $em)
+    public function create(Request $request, SluggerInterface $slugger, EntityManagerInterface $em)
     {
-        //dd($request);
+        $product = new Product;
         //je fais appel à ma class ProductType pour les données du formulaire
-        $builder = $factory->createBuilder(ProductType::class);
-
-        $form = $builder->getForm();
+        //$this->creatForm me permet de créer un form simplement.
+        //$product me permet de récupérer les données
+        $form = $this->createForm(ProductType::class, $product);
 
         //Je demande à mon formulaire de regarder la requête actuelle et de voir si des infos qui l'interresse ou pas, si c'est le cas je les extrais
         $form->handleRequest($request);
@@ -85,21 +120,18 @@ class ProductController extends AbstractController
         //Est ce que mon formulaire est soumis?
         if ($form->isSubmitted()) {
 
-            //Je récupère ses données
-            $product = $form->getData();
-            
             //Je slug le name de mon produit
             $product->setSlug(strtolower($slugger->slug($product->getName())));
 
             //Je persiste mon product pour préparer l'enregistrement         
             $em->persist($product);
-            
-              //Et mon flush envoir la requête SQL
+
+            //Et mon flush envoir la requête SQL
             $em->flush($product);
 
             //dd($product);
         }
-    
+
         //Cette class va me permettre d'afficher la vue de mon formulaire
         $formView = $form->createView();
 
