@@ -20,6 +20,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 class ProductController extends AbstractController
@@ -72,7 +73,7 @@ class ProductController extends AbstractController
 
     #[Route('/admin/product/{id}/edit', name: 'product_edit')]
     //dans ma fonction je reçois l'identifiant qu'il y a dans ma route, j'ai besoin d'aller cherher mon id a éditer donc je fais appel au repository
-    public function edit($id, ProductRepository $productRepository, Request $request, EntityManagerInterface $em)
+    public function edit($id, ProductRepository $productRepository, Request $request, EntityManagerInterface $em, UrlGeneratorInterface $urlGenerator)
     {
 
         //J'utilise la fonction find
@@ -90,11 +91,21 @@ class ProductController extends AbstractController
         if ($form->isSubmitted()) {
             // $product = $form->getData();
             $em->flush();
-            dd($product);
+
+
+            //Redirection sur la page du produit show
+
+            //abstraclController nous permet d'avoir le redirect sur les url 
+            return $this->redirectToRoute('product_show', [
+                'category_slug' => $product->getCategory()->getSlug(),
+                'slug' => $product->getSlug()
+            ]);
         }
 
         //J'affiche la vue de mon formulaire
         $formView = $form->createView();
+
+
 
         //et je return l'affichage et le formView
         return $this->render('product/edit.html.twig', [
@@ -129,7 +140,11 @@ class ProductController extends AbstractController
             //Et mon flush envoir la requête SQL
             $em->flush($product);
 
-            //dd($product);
+            //Redirection
+            return $this->redirectToRoute('product_show', [
+                'category_slug' => $product->getCategory()->getSlug(),
+                'slug' => $product->getSlug()
+            ]);
         }
 
         //Cette class va me permettre d'afficher la vue de mon formulaire
