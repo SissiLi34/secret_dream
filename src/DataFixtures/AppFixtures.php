@@ -5,6 +5,7 @@ namespace App\DataFixtures;
 use Faker;
 use App\Entity\Product;
 use App\Entity\Category;
+use App\Entity\User;
 use Bluemmb\Faker\PicsumPhotosProvider;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -32,13 +33,40 @@ class AppFixtures extends Fixture
         $faker->addProvider(new \Bezhanov\Faker\Provider\Commerce($faker));
         $faker->addProvider(new \Bluemmb\Faker\PicsumPhotosProvider($faker));
 
+        
+        //Je créé l'admin avec le role ADMIN
+        $admin = new User;
+
+        $admin->setEmail("admin@gmail.com")
+            ->setPassword("password")
+            ->setFullName("Admin")
+            ->getRoles(['ROLE_ADMIN']);
+
+            //Et je persiste mon admin
+            $manager->persist($admin);
+            
+        //Chaque itération de la boucle créée un user
+        for ($u = 0; $u < 5; $u++) {
+            $user = new User();
+            //$u donne une suite de num
+            $user->setEmail("user$u@gmail.com")
+                ->setFullName($faker->name)
+                ->setPassword("passeword");
+            //au bout de la boucle le manager va persister les 5 new utilisateurs
+            $manager->persist($user);
+        }
+
+
+
+
+
         // Création de 3 catégories
         for ($c = 0; $c < 3; $c++) {
             $category = new Category;
             $category->setName($faker->department)->setSlug(strtolower($this->slugger->slug($category->getName())));
 
             $manager->persist($category);
-            
+
             //Je persiste entre 15 et 20 produits par category
             for ($p = 0; $p < mt_rand(15, 20); $p++) {
                 $product = new Product;
@@ -53,7 +81,7 @@ class AppFixtures extends Fixture
                     ->setShortDescription($faker->paragraph())
                     //Je rajote une image
                     ->setMainPicture($faker->imageUrl(200, 200, true));
-                    
+
 
                 $manager->persist($product);
             }

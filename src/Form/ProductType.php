@@ -27,26 +27,30 @@ class ProductType extends AbstractType
             'attr' => [
                 //Form bootstrap 
                 'placeholder' => 'Tapez le nom du produit'
-            ]
+            ],
+            'required' => false
         ])
             //Description avec textarea
             ->add('shortDescription', TextareaType::class, [
                 'label' => 'Description courte',
                 'attr' => [
                     'placeholder' => 'Tapez une description assez courte mais parlante pour le visiteur'
-                ]
+                ],
+                'required' => false
             ])
             //Ajout du prix
             ->add('price', MoneyType::class, [
                 'label' => 'Prix du produit',
                 'attr' => [
                     'placeholder' => 'Tapez le prix du produit en €'
-                ]
+                ],
+                'required' => false
             ])
 
             ->add('mainPicture', UrlType::class, [
                 'label' => 'Image du produit',
-                'attr' => ['placeholder' => 'Tapez une URL d\'image']
+                'attr' => ['placeholder' => 'Tapez une URL d\'image'],
+                'required' => false
             ])
 
             //Menu déroulant

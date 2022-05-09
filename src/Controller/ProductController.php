@@ -83,12 +83,9 @@ class ProductController extends AbstractController
         //CréateForm permet de passer un produit et le formulaire travaillera sur celi-ciu
         $form = $this->createForm(ProductType::class, $product);
 
-
-        //$form->setData($product);
-
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             // $product = $form->getData();
             $em->flush();
 
@@ -129,7 +126,7 @@ class ProductController extends AbstractController
         $form->handleRequest($request);
 
         //Est ce que mon formulaire est soumis?
-        if ($form->isSubmitted()) {
+        if ($form->isSubmitted() && $form->isValid()) {
 
             //Je slug le name de mon produit
             $product->setSlug(strtolower($slugger->slug($product->getName())));
