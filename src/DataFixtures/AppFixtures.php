@@ -10,16 +10,19 @@ use Bluemmb\Faker\PicsumPhotosProvider;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\DBAL\Driver\IBMDB2\Exception\Factory;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 class AppFixtures extends Fixture
 {
     //Je veux que ma class reçoive la fonction slugger dans mon constructeur
     protected $slugger;
+    protected $passwordHasher;
 
-    public function __construct(SluggerInterface $slugger)
+    public function __construct(SluggerInterface $slugger, UserPasswordHasherInterface $passwordHasher)
     {
         $this->slugger = $slugger;
+        $this->passwordHasher = $passwordHasher;
     }
 
     //objectManager = entityManagerInterface
@@ -33,25 +36,29 @@ class AppFixtures extends Fixture
         $faker->addProvider(new \Bezhanov\Faker\Provider\Commerce($faker));
         $faker->addProvider(new \Bluemmb\Faker\PicsumPhotosProvider($faker));
 
-        
         //Je créé l'admin avec le role ADMIN
         $admin = new User;
-
+        //Dans le hash je vais avoir le mdp de façon illisible, il est encodé
+        //J'ai passé $admin pour que l'encoder comprenne qu'il vient de la class user et aller voir dans le yaml la conduite à tenir (auto)
+    
         $admin->setEmail("admin@gmail.com")
-            ->setPassword("password")
+            ->setPassword($this->passwordHasher->hashPassword($admin, 'password'))
             ->setFullName("Admin")
             ->getRoles(['ROLE_ADMIN']);
 
-            //Et je persiste mon admin
-            $manager->persist($admin);
-            
+        //Et je persiste mon admin
+        $manager->persist($admin);
+
         //Chaque itération de la boucle créée un user
         for ($u = 0; $u < 5; $u++) {
             $user = new User();
+
+            
+
             //$u donne une suite de num
             $user->setEmail("user$u@gmail.com")
                 ->setFullName($faker->name)
-                ->setPassword("passeword");
+                ->setPassword($this->passwordHasher->hashPassword($user, "password"));
             //au bout de la boucle le manager va persister les 5 new utilisateurs
             $manager->persist($user);
         }
