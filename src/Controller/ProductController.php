@@ -25,7 +25,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 class ProductController extends AbstractController
 {
-    #[Route('/category/{slug}', name: 'app_product_category')]
+    #[Route('/category/{slug}', name: 'app_product_category', priority:-1)]
     //Je me fais livrer avec le repository ma table catégorie de ma bdd
     public function category($slug, CategoryRepository $categoryRepository): Response
     {
