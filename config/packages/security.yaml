@@ -21,12 +21,15 @@ security:
             lazy: true
             provider: app_user_provider
             custom_authenticator: App\Security\LoginFormAuthentificator
+            # form_login:
+            #     login_path: app_security_login
+            #     check_path: app_security_login
             logout:
-                #path: app_logout
+                path: app_security_logout
                 #where to redirect after logout
                 #target: app_any_route
                 #where to redirect after logout
-                #target: app_any_route
+                target: homepage
         
 
             # activate different ways to authenticate
