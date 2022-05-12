@@ -26,6 +26,9 @@ class Category
     // Tableau de produits
     private $produts;
 
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'categories')]
+    private $owner;
+
     public function __construct()
     {
         $this->produts = new ArrayCollection();
@@ -86,6 +89,18 @@ class Category
                 $produt->setCategory(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): self
+    {
+        $this->owner = $owner;
 
         return $this;
     }

@@ -39,6 +39,9 @@ class Product
     #[Assert\Length(min:20, minMessage:"La description courte doit quand même faire au moins 20 caractères")]
     private $shortDescription;
 
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'products')]
+    private $owner;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -112,6 +115,18 @@ class Product
     public function setShortDescription(string $shortDescription): self
     {
         $this->shortDescription = $shortDescription;
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): self
+    {
+        $this->owner = $owner;
 
         return $this;
     }

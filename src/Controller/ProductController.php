@@ -8,21 +8,23 @@ use App\Form\ProductType;
 use App\Repository\ProductRepository;
 use App\Repository\CategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Form\Extension\Core\Type\UrlType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\String\Slugger\SluggerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ProductController extends AbstractController
 {
@@ -73,16 +75,26 @@ class ProductController extends AbstractController
 
 
     #[Route('/admin/product/{id}/edit', name: 'product_edit')]
-    #[IsGranted("ROLE_admin", message:"Vous n'avez pas les droits pour accéder à cette ressource")]
     //dans ma fonction je reçois l'identifiant qu'il y a dans ma route, j'ai besoin d'aller cherher mon id a éditer donc je fais appel au repository
     public function edit($id, ProductRepository $productRepository, Request $request, EntityManagerInterface $em, UrlGeneratorInterface $urlGenerator)
     {
 
-        // $this->denyAccessUnlessGranted("ROLE_ADMIN", null, "Vous n'avez pas le droit d'accéder à cette ressource");
-        
+       
         //J'utilise la fonction find
         $product = $productRepository->find($id);
 
+        if (!$product) {
+            throw new NotFoundHttpException("Ce produit n'existe pas");          
+        }
+
+        $user = $this->getUser();
+        if(!$user) {
+        return $this->redirectToRoute("security_login");
+        }
+        if ($user !== $product->getOwner()) {
+            throw new AccessDeniedHttpException("Vous n'êtes pas le propriétaire de ce produit");
+        }
+        
         //Création du formulaire d'édition et du forulaire que j'ai créé
         //CréateForm permet de passer un produit et le formulaire travaillera sur celi-ciu
         $form = $this->createForm(ProductType::class, $product);
