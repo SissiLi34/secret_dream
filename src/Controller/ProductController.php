@@ -8,6 +8,7 @@ use App\Form\ProductType;
 use App\Repository\ProductRepository;
 use App\Repository\CategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -28,7 +29,7 @@ class ProductController extends AbstractController
     #[Route('/category/{slug}', name: 'app_product_category', priority:-1)]
     //Je me fais livrer avec le repository ma table catégorie de ma bdd
     public function category($slug, CategoryRepository $categoryRepository): Response
-    {
+    {       
         // Je demande à afficher 1 catégorie grâce au critère findoneby
         $category = $categoryRepository->findOneBy([
             // Le critère : recevoir le slug reçu dans l'URL
@@ -72,10 +73,13 @@ class ProductController extends AbstractController
 
 
     #[Route('/admin/product/{id}/edit', name: 'product_edit')]
+    #[IsGranted("ROLE_admin", message:"Vous n'avez pas les droits pour accéder à cette ressource")]
     //dans ma fonction je reçois l'identifiant qu'il y a dans ma route, j'ai besoin d'aller cherher mon id a éditer donc je fais appel au repository
     public function edit($id, ProductRepository $productRepository, Request $request, EntityManagerInterface $em, UrlGeneratorInterface $urlGenerator)
     {
 
+        // $this->denyAccessUnlessGranted("ROLE_ADMIN", null, "Vous n'avez pas le droit d'accéder à cette ressource");
+        
         //J'utilise la fonction find
         $product = $productRepository->find($id);
 
@@ -113,9 +117,13 @@ class ProductController extends AbstractController
 
 
     #[Route('/admin/product/create', name: 'product_create')]
+    #[IsGranted("ROLE_admin", message:"Vous n'avez pas les droits pour accéder à cette catégorie")]
     //création du formulaire création de produit 
     public function create(Request $request, SluggerInterface $slugger, EntityManagerInterface $em)
     {
+        // $this->denyAccessUnlessGranted("ROLE_ADMIN", null, "Vous n'avez pas le droit d'accéder à cette ressource");
+        
+        
         $product = new Product;
         //je fais appel à ma class ProductType pour les données du formulaire
         //$this->creatForm me permet de créer un form simplement.

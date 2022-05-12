@@ -42,9 +42,9 @@ class AppFixtures extends Fixture
         //J'ai passé $admin pour que l'encoder comprenne qu'il vient de la class user et aller voir dans le yaml la conduite à tenir (auto)
     
         $admin->setEmail("admin@gmail.com")
-            ->setPassword($this->passwordHasher->hashPassword($admin, 'password'))
             ->setFullName("Admin")
-            ->getRoles(['ROLE_ADMIN']);
+            ->setRoles(['ROLE_ADMIN'])            
+            ->setPassword($this->passwordHasher->hashPassword($admin, 'password'));
 
         //Et je persiste mon admin
         $manager->persist($admin);
