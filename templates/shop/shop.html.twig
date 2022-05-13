@@ -16,34 +16,9 @@
 		{# Ma boucle for va générer 3 produits p qui sont dans mon tableau products de homeController #}
 		{% for p in products %}
 			<div class="col">
-				<div
-					class="card">
-					{# Je passe mon image faker #}
-					<img src="{{ p.mainPicture }}" class="img-fluid" alt="Photo d'un produit">
-					<div
-						class="card-body">
-						{# Je passe mon titre et le prix faker #}
-						<h4 class="card-title">{{ p.name }}
-							{{ p.price /100  }}
-							&euro;</h4>
+				{# include de la carte produit #}
+		{% include "./product/_product_card.html.twig" %}
 
-						<span class="badge bg-info badge-info">
-							{{ p.category.name }}
-						</span>
-
-
-						{# Je passe ma description faker #}
-						<p class="card-taxt">{{ p.shortDescription }}</p>
-						
-						<a href="{{ path('product_show',{
-							'category_slug':p.category.slug,
-							'slug' : p.slug
-						}) }}" class="btn btn-primary btn-sm">Détails</a>
-
-
-						<a href="#" class="btn btn-success btn-sm">Ajouter</a>
-					</div>
-				</div>
 			</div>
 		{% endfor %}
 	</div>
