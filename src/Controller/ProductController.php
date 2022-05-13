@@ -73,7 +73,7 @@ class ProductController extends AbstractController
         ]);
     }
 
-
+//Je veux que seul celui qui modifie le produit soit celui qui l'a créé
     #[Route('/admin/product/{id}/edit', name: 'product_edit')]
     //dans ma fonction je reçois l'identifiant qu'il y a dans ma route, j'ai besoin d'aller cherher mon id a éditer donc je fais appel au repository
     public function edit($id, ProductRepository $productRepository, Request $request, EntityManagerInterface $em, UrlGeneratorInterface $urlGenerator)
@@ -82,15 +82,21 @@ class ProductController extends AbstractController
        
         //J'utilise la fonction find
         $product = $productRepository->find($id);
-
+        //Je fais mon message d'erreur si le produit n'existe pas
         if (!$product) {
             throw new NotFoundHttpException("Ce produit n'existe pas");          
         }
-
-        $user = $this->getUser();
+        
+        //Je récupère l'user connecté
+        $user = $this->getUser();//security->getUser
+        
+        //Si le user n'est pas connecté je le redirige vers la page de connexion
         if(!$user) {
         return $this->redirectToRoute("security_login");
         }
+        
+        //Est ce que l'utilisateur qui est connecté est le même que celui qui a créé le produit ?
+        //Si ce n'est pas le cas je fais une exeption
         if ($user !== $product->getOwner()) {
             throw new AccessDeniedHttpException("Vous n'êtes pas le propriétaire de ce produit");
         }
@@ -129,11 +135,11 @@ class ProductController extends AbstractController
 
 
     #[Route('/admin/product/create', name: 'product_create')]
-    #[IsGranted("ROLE_admin", message:"Vous n'avez pas les droits pour accéder à cette catégorie")]
+    // #[IsGranted("ROLE_admin", message:"Vous n'avez pas les droits pour accéder à cette catégorie")]
     //création du formulaire création de produit 
     public function create(Request $request, SluggerInterface $slugger, EntityManagerInterface $em)
     {
-        // $this->denyAccessUnlessGranted("ROLE_ADMIN", null, "Vous n'avez pas le droit d'accéder à cette ressource");
+        $this->denyAccessUnlessGranted("ROLE_ADMIN", null, "Vous n'avez pas le droit d'accéder à cette ressource");
         
         
         $product = new Product;
