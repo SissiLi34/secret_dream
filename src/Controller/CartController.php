@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Cart\CartService;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\Mapping\Id;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,59 +15,120 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class CartController extends AbstractController
 {
+
+    /**
+     * @var ProductRepository
+     */
+    protected $productRepository;
+
+    /**
+     * @var CartService
+     */
+    protected $cartService;
+
+    public function __construct(ProductRepository $productRepository, CartService $cartService)
+    {
+        $this->productRepository = $productRepository;
+        $this->cartService = $cartService;
+    }
+
+
     #[Route('/cart/add/{id}', name: 'app_cart_add', requirements: ["id" => "\d+"])]
 
-
-    //Je rends l'identifiant du produit par son id
-    public function add($id, ProductRepository $productRepository, SessionInterface $session): Response
+    public function add($id, Request $request): Response
     {
-        //J'explique que ce produit existe dans le panier   
-        //dd($request);
-
-
         //0. Est ce que le produit existe ?
-        $product = $productRepository->find($id);
+        $product = $this->productRepository->find($id);
+        //S'il n'existe pas
         if (!$product) {
             throw $this->createNotFoundException("Le produit $id n'existe pas");
         }
-        //1.Retrouver le panier dans la session (sous forme de tableau)
-
-
-        //2.S'il n'existe pas encore, prendre un tableau vide
-        $cart = $session->get('cart', []);
-
-        //3.Voir si le produit ($id) existe déjà dans le tableau
-        //4.Si c'est le cas, augmenter la quantité
-        //5.Sinon ajouter le produit avec la quantité 1
-        if (array_key_exists($id, $cart)) {
-            $cart[$id]++;
-        } else {
-            $cart[$id] = 1;
-        }
-
-        //6.Enregistrer le tableau mis à jour dans la session
-        //Dansla session, le cart est = au tableau cart qui a été mis a jour juste au dessus (je le re stoke)
-        $session->set('cart', $cart);
+        //Je fais appel à la class CartService ou sont regrouppés tous les services et j'appelle l'id
+        $this->cartService->add($id);
 
         //Si je veux supprimer le panier c'est:
         //$request->getSession()->remove('cart');
 
-// /** @var FlashBag */
+        //je me sers du Flash pour ajouter un msg d'action
+        $this->addFlash('success', ["title" => "", "content" => "Le produit a bien été ajouté au panier"]);
 
-// $flashBag = $session->getBag('flashes');
-//La methode add ajoute des msg
-// $flashBag->add('success', "Tout s'est bien passé"); 
-$this->addFlash('success',["title" => "Félicitation", "content" => "Le produit a bien été ajouté au panier"]);
-
-//La méthode get lit et supprime les msg
-//dump($flashBag->get('succes'));
+//si dans url i y a returntoCart retourne vers la cart
+        if ($request->query->get('returnToCart')) {
+            return $this->redirectToRoute("cart_show");
+        }
 
 
-//dd($flashBag);
-
+//si je n'ai pas l'info returnToCart je repars ur la page du produits
         return $this->redirectToRoute('product_show', [
             'category_slug' => $product->getCategory()->getSlug(),
             'slug' => $product->getSlug()
         ]);
+    }
+
+
+
+
+
+    #[Route('/cart', name: 'cart_show')]
+    //Je récupèe la session avec argumentResolver ainsi que le produit
+    public function show()
+    { 
+        //J'injecte la méthode getdetailedCartItems de mon cartService
+        $detailedCart = $this->cartService->getDetailedCartItems();
+
+        $total = $this->cartService->getTotal();
+
+        return $this->render('cart/index.html.twig', [
+            //Je passe à twig une variable items qui est le tableau $detailedCart et le total
+            'items' => $detailedCart,
+            'total' => $total
+        ]);
+    }
+
+
+
+
+
+    #[Route('/cart/delete/{id}', name: 'cart_delete', requirements: ["id" => "\d+"])]
+    public function delete($id)
+    {
+        //je vérifie que le produit existe bien
+        $product = $this->productRepository->find($id);
+        //Si le produit n'existe pas je passe une exeption
+        if (!$product) {
+            throw $this->createNotFoundException("Le produit $id n'existe pas et ne peut pas être supprimé !");
+        }
+        //je passe à la function remove de cartService l'id à supprimer
+        $this->cartService->remove($id);
+        //J'envoie mon message de réussite
+        $this->addFlash('success', ["title" => "", "content" => "Le produit a bien été supprimé du panier"]);
+
+
+        //Et enfin je redirige vers le produit vérifier qu'il a bien été supprimé
+        return $this->redirectToRoute("cart_show");
+    }
+
+
+
+
+
+
+    #[Route('/cart/decrement/{id}', name: 'cart_decrement', requirements: ["id" => "\d+"])]
+    public function decrement($id)
+    {
+        //je vérifie que le produit existe bien
+        $product = $this->productRepository->find($id);
+        
+        //Si le produit n'existe pas je passe une exeption
+        if (!$product) {
+            throw $this->createNotFoundException("Le produit $id n'existe pas et ne peut pas être décrémenté !");
+        }
+
+        $this->cartService->decrement($id);
+
+                //J'envoie mon message de réussite
+                $this->addFlash('success', ["title" => "", "content" => "Le produit a bien été retiré du panier"]);
+               
+        return $this->redirectToRoute("cart_show");
     }
 }
