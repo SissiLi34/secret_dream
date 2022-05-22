@@ -3,15 +3,16 @@
 namespace App\DataFixtures;
 
 use Faker;
+use App\Entity\User;
 use App\Entity\Product;
 use App\Entity\Category;
-use App\Entity\User;
+use App\Entity\Purchase;
 use Bluemmb\Faker\PicsumPhotosProvider;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\DBAL\Driver\IBMDB2\Exception\Factory;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
@@ -49,6 +50,9 @@ class AppFixtures extends Fixture
         //Et je persiste mon admin
         $manager->persist($admin);
 
+        //je créé un tableau vide pour y rajouter les user qui auront une commande affectée         
+        $users = [];
+        
         //Chaque itération de la boucle créée un user
         for ($u = 0; $u < 5; $u++) {
             $user = new User();
@@ -59,8 +63,12 @@ class AppFixtures extends Fixture
             $user->setEmail("user$u@gmail.com")
                 ->setFullName($faker->name)
                 ->setPassword($this->passwordHasher->hashPassword($user, "password"));
+            //Dans le tableau vide que j'ai créé viendra se mettre les users avec commande
+            $users[] = $user;
+                
             //au bout de la boucle le manager va persister les 5 new utilisateurs
             $manager->persist($user);
+            
         }
 
 
@@ -94,7 +102,25 @@ class AppFixtures extends Fixture
             }
         }
 
+//tant que p est inferieur à ..
+for ($p=0; $p < mt_rand(20, 40) ; $p++) { 
+    $purchase = new Purchase;
 
+    $purchase->setFullName($faker->name)
+            ->setAddress($faker->streetAddress)
+            ->setPostalCode($faker->postcode)
+            ->setCity($faker->city)
+            ->setUser($faker->randomElement($users))
+            ->setTotal(mt_rand(2000, 30000))
+            ->setPurchasedAt($faker->datetime_immutable);
+    //faker va me fournir 90% de commnde payé et le reste en attente
+    if ($faker->boolean(90)) {
+        //pr défaut j'ai mis pending donc je ne mets pas de condition puisque si il n'est pas dans le 90 il serz en attente de paiement
+        $purchase->setStatus(Purchase::STATUS_PAID);
+        //Il me reste à lier un user à cette purchase
+    }
+         $manager->persist($purchase);   
+}
 
         //Mettre le flush hors de la boucle pour ne faire qu'une requête et obtinmiser
         $manager->flush();

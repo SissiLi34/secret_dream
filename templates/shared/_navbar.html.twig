@@ -55,8 +55,10 @@
 					 Panier 
 					</a>
 					</li>
-					{# S'il y a un user, je veux qu'il puisse se déconnecter #}
-					{% if app.user %}	
+					{# S'il y a un user, je veux qu'il puisse se déconnecter losqu'i est connecté #}
+					{% if app.user %}
+					{# N'apparaitra que si le user est connecté #}
+					<li class="nav-item"><a href="#" class="nav-link">Mes commandes</a></li>	
 						<li class="nav-item"><a href="{{ path('app_security_logout') }}" class="btn btn-danger">Déconnexion</a></li>
 					{% else %}
 						<li class="nav-bar"><a href="#" class="nav-link">Inscription</a></li>
